@@ -1,0 +1,11 @@
+--- a/configure	2025-07-07 20:37:35
++++ b/configure	2025-07-07 20:37:38
+@@ -21708,7 +21708,7 @@
+   $as_echo_n "(cached) " >&6
+ else
+ 
+-                for d in /usr/lib /usr/lib32 /usr/lib/64 /usr/lib64; do
++                for d in /usr/lib /usr/lib32 /usr/lib/64 /usr/lib64 /usr/lib/x86_64-linux-gnu; do
+                     for e in a so sl dylib dll.a; do
+                         libc="$d/libc.$e"
+                         if test -f $libc; then
