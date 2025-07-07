@@ -1,0 +1,84 @@
+---
+name: Build Target Releases
+
+on: [push]
+#on:
+#  push:
+#    branches:
+#      - master
+#      - feature/automate-dependency-building
+#  pull_request:
+#    branches:
+#      - master
+
+permissions:
+  contents: write
+
+env:
+  # Dependency versions - see config.sh.
+  # Target versions:
+  OPENSSL_RELEASE: 3.5.1
+
+  # Build time env
+  WORKING_SRC_DIR: /tmp/src
+  WORKING_BUILD_DIR: /tmp/build
+
+jobs:
+  build:
+    runs-on: ${{ matrix.runner }}
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: OpenSSL (arm)
+            script: openssl
+            release: $OPENSSL_RELEASE
+            arch: arm
+            runner: ubuntu-latest
+
+          - name: OpenSSL (arm64)
+            script: openssl
+            release: $OPENSSL_RELEASE
+            arch: arm64
+            runner: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Android SDK/NDK
+        run: ./scripts/setup.sh
+
+      - name: Build new artifacts (if required)
+        run: ./scripts/${{ matrix.script }}.sh ${{ matrix.release }} ${{ matrix.arch }}
+
+      - name: Publish new artifacts (if required)
+        run: |
+          set +e
+          if [ "$(git status --porcelain | wc -l)" != "0" ];
+          then
+            git config user.email "ci@opencpn.org"
+            git config user.name "Github Actions"
+
+            git add .
+            git commit -m "Update ${{ matrix.name }} to ${{ matrix.release }}"
+          
+            # Since we are building multiple items, we might end up with a conflicting push
+            # Attempt the push a few times with a rebase
+            for _ in {1..10};
+            do
+              if [ $_ -gt 1 ];
+              then
+                echo "Rebasing ${GITHUB_REF#refs/heads/} after a failed push"
+                git fetch -a
+                git rebase origin/${GITHUB_REF#refs/heads/}
+              fi
+
+              echo "Attempting push to ${GITHUB_REF#refs/heads/}"
+              git push origin ${GITHUB_REF#refs/heads/}
+              if [ $? -eq 0 ]; then exit 0; fi
+              sleep 1
+            done
+          
+            echo "Failed to push after retries"
+            exit 1
+          fi
