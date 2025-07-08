@@ -58,11 +58,13 @@ function set_android_compiler() {
         export CC="armv7a-linux-androideabi${TARGET_ANDROID_API}-clang"
         export CXX="armv7a-linux-androideabi${TARGET_ANDROID_API}-clang++"
         export build_target_host="armv7a-linux-androideabi${TARGET_ANDROID_API}"
+        export AR="llvm-ar"
       ;;
       arm64)
         export CC="aarch64-linux-android${TARGET_ANDROID_API}-clang"
         export CXX="aarch64-linux-android${TARGET_ANDROID_API}-clang++"
         export build_target_host="aarch64-linux-android${TARGET_ANDROID_API}"
+        export AR="llvm-ar"
       ;;
   esac
 }

@@ -19,6 +19,7 @@ env:
   # Target versions:
   OPENSSL_RELEASE: 3.5.1
   QT_RELEASE: 5.15.17
+  WXWIDGETS_RELEASE: 3.0.5
 
   # Build time env
   WORKING_SRC_DIR: /tmp/src
@@ -54,6 +55,19 @@ jobs:
             release: $QT_RELEASE
             arch: arm
             runner: macos-latest
+
+          - name: wxWidgets (arm)
+            script: wxwidgets
+            release: $WXWIDGETS_RELEASE
+            arch: arm
+            runner: ubuntu-latest
+
+          - name: wxWidgets (arm64)
+            script: wxwidgets
+            release: $WXWIDGETS_RELEASE
+            arch: arm64
+            runner: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
