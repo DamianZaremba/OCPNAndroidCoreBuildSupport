@@ -18,6 +18,7 @@ env:
   # Dependency versions - see config.sh.
   # Target versions:
   OPENSSL_RELEASE: 3.5.1
+  QT_RELEASE: 5.15.17
 
   # Build time env
   WORKING_SRC_DIR: /tmp/src
@@ -42,6 +43,17 @@ jobs:
             release: $OPENSSL_RELEASE
             arch: arm64
             runner: ubuntu-latest
+
+          - name: QT5 (x86_64)
+            script: qt5
+            release: $QT_RELEASE
+            runner: ubuntu-latest
+
+          - name: QT5 (arm64)
+            script: qt5
+            release: $QT_RELEASE
+            arch: arm
+            runner: macos-latest
     steps:
       - uses: actions/checkout@v4
 
